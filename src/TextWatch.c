@@ -7,15 +7,16 @@
 #define DEBUG 0
 #define BUFFER_SIZE 44
 
+// TODO: Figure out how to get a new UUID
 #define MY_UUID { 0x49, 0x6E, 0x04, 0xAD, 0x13, 0x2A, 0x48, 0xAB, 0xB1, 0x65, 0x7F, 0xF4, 0xA9, 0x98, 0x72, 0xD2 }
 PBL_APP_INFO(MY_UUID,
-             "TextWatch", "Wip Interactive",
+             "Text and Date", "stough@ginkoleaf.net",
              1, 0,
              DEFAULT_MENU_ICON,
 #if DEBUG
              APP_INFO_STANDARD_APP
 #else
-			 APP_INFO_WATCH_FACE
+      	     APP_INFO_WATCH_FACE
 #endif
 );
 
@@ -31,12 +32,14 @@ typedef struct {
 Line line1;
 Line line2;
 Line line3;
+Line line4;
 
 PblTm t;
 
 static char line1Str[2][BUFFER_SIZE];
 static char line2Str[2][BUFFER_SIZE];
 static char line3Str[2][BUFFER_SIZE];
+static char line4Str[2][BUFFER_SIZE];
 
 static bool textInitialized = false;
 
@@ -111,6 +114,16 @@ bool needToUpdateLine(Line *line, char lineStr[2][BUFFER_SIZE], char *nextValue)
 	return false;
 }
 
+// Represent the date as displayable string
+void date_to_string(PblTm *t, char *line4, size_t length) {
+  memset(line4, 0, length);
+
+  string_format_time(line4, length, "%m.%d.%y", t);
+  // Replace leading '0' in month and day with ''
+  if (line4[3] == '0') memmove(&line4[3], &line4[4], length - 4);
+  if (line4[0] =='0') memmove(&line4[0], &line4[1], length - 1);
+}
+
 // Update screen based on new time
 void display_time(PblTm *t)
 {
@@ -118,8 +131,10 @@ void display_time(PblTm *t)
 	char textLine1[BUFFER_SIZE];
 	char textLine2[BUFFER_SIZE];
 	char textLine3[BUFFER_SIZE];
+	char textLine4[BUFFER_SIZE];
 	
 	time_to_3words(t->tm_hour, t->tm_min, textLine1, textLine2, textLine3, BUFFER_SIZE);
+        date_to_string(t, textLine4, BUFFER_SIZE);
 	
 	if (needToUpdateLine(&line1, line1Str, textLine1)) {
 		updateLineTo(&line1, line1Str, textLine1);	
@@ -130,16 +145,21 @@ void display_time(PblTm *t)
 	if (needToUpdateLine(&line3, line3Str, textLine3)) {
 		updateLineTo(&line3, line3Str, textLine3);	
 	}
+	if (needToUpdateLine(&line4, line4Str, textLine4)) {
+		updateLineTo(&line4, line4Str, textLine4);	
+	}
 }
 
 // Update screen without animation first time we start the watchface
 void display_initial_time(PblTm *t)
 {
 	time_to_3words(t->tm_hour, t->tm_min, line1Str[0], line2Str[0], line3Str[0], BUFFER_SIZE);
+        date_to_string(t, line4Str[0], BUFFER_SIZE);
 	
 	text_layer_set_text(&line1.currentLayer, line1Str[0]);
 	text_layer_set_text(&line2.currentLayer, line2Str[0]);
 	text_layer_set_text(&line3.currentLayer, line3Str[0]);
+	text_layer_set_text(&line4.currentLayer, line4Str[0]);
 }
 
 
@@ -156,6 +176,15 @@ void configureBoldLayer(TextLayer *textlayer)
 void configureLightLayer(TextLayer *textlayer)
 {
 	text_layer_set_font(textlayer, fonts_get_system_font(FONT_KEY_GOTHAM_42_LIGHT));
+	text_layer_set_text_color(textlayer, GColorWhite);
+	text_layer_set_background_color(textlayer, GColorClear);
+	text_layer_set_text_alignment(textlayer, GTextAlignmentLeft);
+}
+
+
+void configureDateLayer(TextLayer *textlayer)
+{
+	text_layer_set_font(textlayer, fonts_get_system_font(FONT_KEY_GOTHAM_34_MEDIUM_NUMBERS));
 	text_layer_set_text_color(textlayer, GColorWhite);
 	text_layer_set_background_color(textlayer, GColorClear);
 	text_layer_set_text_alignment(textlayer, GTextAlignmentLeft);
@@ -220,22 +249,28 @@ void handle_init(AppContextRef ctx) {
 	resource_init_current_app(&APP_RESOURCES);
 	
 	// 1st line layers
-	text_layer_init(&line1.currentLayer, GRect(0, 18, 144, 50));
-	text_layer_init(&line1.nextLayer, GRect(144, 18, 144, 50));
+	text_layer_init(&line1.currentLayer, GRect(0, 0, 144, 50));
+	text_layer_init(&line1.nextLayer, GRect(144, 0, 144, 50));
 	configureBoldLayer(&line1.currentLayer);
 	configureBoldLayer(&line1.nextLayer);
 
 	// 2nd layers
-	text_layer_init(&line2.currentLayer, GRect(0, 55, 144, 50));
-	text_layer_init(&line2.nextLayer, GRect(144, 55, 144, 50));
+	text_layer_init(&line2.currentLayer, GRect(0, 37, 144, 50));
+	text_layer_init(&line2.nextLayer, GRect(144, 37, 144, 50));
 	configureLightLayer(&line2.currentLayer);
 	configureLightLayer(&line2.nextLayer);
 
 	// 3rd layers
-	text_layer_init(&line3.currentLayer, GRect(0, 92, 144, 50));
-	text_layer_init(&line3.nextLayer, GRect(144, 92, 144, 50));
+	text_layer_init(&line3.currentLayer, GRect(0, 74, 144, 50));
+	text_layer_init(&line3.nextLayer, GRect(144, 74, 144, 50));
 	configureLightLayer(&line3.currentLayer);
 	configureLightLayer(&line3.nextLayer);
+
+	// 4rd layers
+	text_layer_init(&line4.currentLayer, GRect(0, 120, 144, 50));
+	text_layer_init(&line4.nextLayer, GRect(144, 120, 144, 50));
+	configureDateLayer(&line4.currentLayer);
+	configureDateLayer(&line4.nextLayer);
 
 	// Configure time on init
 	get_time(&t);
@@ -248,6 +283,8 @@ void handle_init(AppContextRef ctx) {
 	layer_add_child(&window.layer, &line2.nextLayer.layer);
 	layer_add_child(&window.layer, &line3.currentLayer.layer);
 	layer_add_child(&window.layer, &line3.nextLayer.layer);
+	layer_add_child(&window.layer, &line4.currentLayer.layer);
+	layer_add_child(&window.layer, &line4.nextLayer.layer);
 	
 #if DEBUG
 	// Button functionality

@@ -28,7 +28,7 @@ static const char* const TEENS[] ={
 };
 
 static const char* const TENS[] = {
-  "",
+  "oh",
   "ten",
   "twenty",
   "thirty",
@@ -40,17 +40,18 @@ static const char* const TENS[] = {
   "ninety"
 };
 
-static size_t append_number(char* words, int num) {
+static size_t append_number(char* words, int num, short oh) {
   int tens_val = num / 10 % 10;
   int ones_val = num % 10;
 
   size_t len = 0;
 
-  if (tens_val > 0) {
-    if (tens_val == 1 && num != 10) {
-      strcat(words, TEENS[ones_val]);
-      return strlen(TEENS[ones_val]);
-    }
+  
+  if (tens_val == 1 && num != 10) {
+    strcat(words, TEENS[ones_val]);
+    return strlen(TEENS[ones_val]);
+  }
+  if ((num != 0) && ((tens_val != 0) || oh)) {
     strcat(words, TENS[tens_val]);
     len += strlen(TENS[tens_val]);
     if (ones_val > 0) {
@@ -82,11 +83,11 @@ void time_to_words(int hours, int minutes, char* words, size_t length) {
   if (hours == 0 || hours == 12) {
     remaining -= append_string(words, remaining, TEENS[2]);
   } else {
-    remaining -= append_number(words, hours % 12);
+    remaining -= append_number(words, hours % 12, 0);
   }
 
   remaining -= append_string(words, remaining, " ");
-  remaining -= append_number(words, minutes);
+  remaining -= append_number(words, minutes, 1);
   remaining -= append_string(words, remaining, " ");
 }
 
@@ -114,11 +115,16 @@ void time_to_3words(int hours, int minutes, char *line1, char *line2, char *line
 	}
 	
 	// Truncate long teen values
-	if (strlen(line2) > 7) {
-		char *pch = strstr(line2, "teen");
-		if (pch) {
-			memcpy(line3, pch, 4);
-			pch[0] = 0;
-		}
-	}
+        if (strstr(line2, "teen") != 0) {
+	  if (!((strstr(line2, "thir") != 0) ||
+                (strstr(line2, "fif") != 0) ||
+                (strstr(line2, "six") != 0))) {
+            char *pch = strstr(line2, "teen");
+            if (pch) {
+              memcpy(line3, pch, 4);
+              pch[0] = 0;
+            }
+          }       
+        }
 }
+
