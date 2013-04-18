@@ -285,7 +285,7 @@ void handle_init(AppContextRef ctx) {
 
         // Time/Date Layout Offsets
         TextLineOffset = 0;
-        DateOffset = 117;
+        DateOffset = 123;
         
 	// 1st line layer
 	text_layer_init(&line1.currentLayer,
