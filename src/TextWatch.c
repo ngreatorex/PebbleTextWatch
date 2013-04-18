@@ -146,8 +146,8 @@ void display_time(PblTm *t)
 	char textLine5[BUFFER_SIZE];
 	
 	time_to_3words(t->tm_hour, t->tm_min, textLine1, textLine2, textLine3, BUFFER_SIZE);
-        date_to_string(t, textLine4, BUFFER_SIZE);
-        day_of_week(t, textLine5, BUFFER_SIZE);
+        day_of_week(t, textLine4, BUFFER_SIZE);
+        date_to_string(t, textLine5, BUFFER_SIZE);
 	
 	if (needToUpdateLine(&line1, line1Str, textLine1)) {
 		updateLineTo(&line1, line1Str, textLine1);	
@@ -174,8 +174,8 @@ void display_time(PblTm *t)
 void display_initial_time(PblTm *t)
 {
 	time_to_3words(t->tm_hour, t->tm_min, line1Str[0], line2Str[0], line3Str[0], BUFFER_SIZE);
-        date_to_string(t, line4Str[0], BUFFER_SIZE);
-        day_of_week(t, line5Str[0], BUFFER_SIZE);
+        day_of_week(t, line4Str[0], BUFFER_SIZE);
+        date_to_string(t, line5Str[0], BUFFER_SIZE);
         
 	text_layer_set_text(&line1.currentLayer, line1Str[0]);
 	text_layer_set_text(&line2.currentLayer, line2Str[0]);
@@ -289,12 +289,12 @@ void handle_init(AppContextRef ctx) {
 	configureLightLayer(&line3.nextLayer);
 
 	// 4th layer - Date
-	text_layer_init(&line4.currentLayer, GRect(64, 124, 144-64, 50));
-	configureDateLayer(&line4.currentLayer);
+	text_layer_init(&line4.currentLayer, GRect(0, 117, 72, 50));
+	configureBoldLayer(&line4.currentLayer);
 
 	// 5th layer - Week Day
-	text_layer_init(&line5.currentLayer, GRect(0, 117, 72, 50));
-	configureBoldLayer(&line5.currentLayer);
+	text_layer_init(&line5.currentLayer, GRect(64, 124, 144-64, 50));
+	configureDateLayer(&line5.currentLayer);
 
 	// Configure time on init
 	get_time(&t);
