@@ -132,7 +132,7 @@ void day_of_week(PblTm *t, char *line, size_t length) {
   // Two Letter Day of the Week
   string_format_time(line, length, "%a", t);
   line[0] += 32;
-  line[3] = 0;
+  line[2] = 0;
 }
 
 // Update screen based on new time
@@ -186,30 +186,42 @@ void display_initial_time(PblTm *t)
 
 
 // Configure the first line of text
-void configureBoldLayer(TextLayer *textlayer)
+void configureBoldLayer(TextLayer *textlayer, bool right)
 {
 	text_layer_set_font(textlayer, fonts_get_system_font(FONT_KEY_GOTHAM_42_BOLD));
 	text_layer_set_text_color(textlayer, GColorWhite);
 	text_layer_set_background_color(textlayer, GColorClear);
-	text_layer_set_text_alignment(textlayer, GTextAlignmentLeft);
+        if (right) {
+          text_layer_set_text_alignment(textlayer, GTextAlignmentRight);
+        } else {
+          text_layer_set_text_alignment(textlayer, GTextAlignmentLeft);
+        }
 }
 
 // Configure for the 2nd and 3rd lines
-void configureLightLayer(TextLayer *textlayer)
+void configureLightLayer(TextLayer *textlayer, bool right)
 {
 	text_layer_set_font(textlayer, fonts_get_system_font(FONT_KEY_GOTHAM_42_LIGHT));
 	text_layer_set_text_color(textlayer, GColorWhite);
 	text_layer_set_background_color(textlayer, GColorClear);
-	text_layer_set_text_alignment(textlayer, GTextAlignmentLeft);
+        if (right) {
+          text_layer_set_text_alignment(textlayer, GTextAlignmentRight);
+        } else {
+          text_layer_set_text_alignment(textlayer, GTextAlignmentLeft);
+        }
 }
 
 
-void configureDateLayer(TextLayer *textlayer)
+void configureDateLayer(TextLayer *textlayer, bool right)
 {
 	text_layer_set_font(textlayer, fonts_get_system_font(FONT_KEY_GOTHAM_34_MEDIUM_NUMBERS));
 	text_layer_set_text_color(textlayer, GColorWhite);
 	text_layer_set_background_color(textlayer, GColorClear);
-	text_layer_set_text_alignment(textlayer, GTextAlignmentRight);
+        if (right) {
+          text_layer_set_text_alignment(textlayer, GTextAlignmentRight);
+        } else {
+          text_layer_set_text_alignment(textlayer, GTextAlignmentLeft);
+        }
 }
 
 
@@ -262,39 +274,51 @@ void click_config_provider(ClickConfig **config, Window *window) {
 
 void handle_init(AppContextRef ctx) {
   	(void)ctx;
-
+        short TextLineOffset, DateOffset;
+        
 	window_init(&window, "TextWatch");
 	window_stack_push(&window, true);
 	window_set_background_color(&window, GColorBlack);
 
 	// Init resources
 	resource_init_current_app(&APP_RESOURCES);
-	
+
+        // Time/Date Layout Offsets
+        TextLineOffset = 0;
+        DateOffset = 117;
+        
 	// 1st line layer
-	text_layer_init(&line1.currentLayer, GRect(0, 0, 144, 50));
-	text_layer_init(&line1.nextLayer, GRect(144, 0, 144, 50));
-	configureBoldLayer(&line1.currentLayer);
-	configureBoldLayer(&line1.nextLayer);
+	text_layer_init(&line1.currentLayer,
+                        GRect(0, TextLineOffset, 144, 50));
+	text_layer_init(&line1.nextLayer,
+                        GRect(144, TextLineOffset, 144, 50));
+	configureBoldLayer(&line1.currentLayer, false);
+	configureBoldLayer(&line1.nextLayer, false);
 
 	// 2nd line layer
-	text_layer_init(&line2.currentLayer, GRect(0, 37, 144, 50));
-	text_layer_init(&line2.nextLayer, GRect(144, 37, 144, 50));
-	configureLightLayer(&line2.currentLayer);
-	configureLightLayer(&line2.nextLayer);
+	text_layer_init(&line2.currentLayer,
+                        GRect(0, 37 + TextLineOffset, 144, 50));
+	text_layer_init(&line2.nextLayer,
+                        GRect(144, 37 + TextLineOffset, 144, 50));
+	configureLightLayer(&line2.currentLayer, false);
+	configureLightLayer(&line2.nextLayer, false);
 
 	// 3rd line layer
-	text_layer_init(&line3.currentLayer, GRect(0, 74, 144, 50));
-	text_layer_init(&line3.nextLayer, GRect(144, 74, 144, 50));
-	configureLightLayer(&line3.currentLayer);
-	configureLightLayer(&line3.nextLayer);
+	text_layer_init(&line3.currentLayer,
+                        GRect(0, 74 + TextLineOffset, 144, 50));
+	text_layer_init(&line3.nextLayer,
+                        GRect(144, 74 + TextLineOffset, 144, 50));
+	configureLightLayer(&line3.currentLayer, false);
+	configureLightLayer(&line3.nextLayer, false);
 
-	// 4th layer - Date
-	text_layer_init(&line4.currentLayer, GRect(0, 117, 72, 50));
-	configureBoldLayer(&line4.currentLayer);
+	// 4th layer - Week Day
+	text_layer_init(&line4.currentLayer, GRect(0, DateOffset, 62, 50));
+	configureLightLayer(&line4.currentLayer, true);
 
-	// 5th layer - Week Day
-	text_layer_init(&line5.currentLayer, GRect(64, 124, 144-64, 50));
-	configureDateLayer(&line5.currentLayer);
+	// 5th layer - Date
+	text_layer_init(&line5.currentLayer,
+                        GRect(66, 8 + DateOffset, 80, 50));
+	configureDateLayer(&line5.currentLayer, false);
 
 	// Configure time on init
 	get_time(&t);
