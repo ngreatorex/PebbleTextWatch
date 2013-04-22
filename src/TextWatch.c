@@ -126,13 +126,15 @@ void date_to_string(PblTm *t, char *line, size_t length) {
   if (line[0] =='0') memmove(&line[0], &line[1], length - 1);
 }
 
+// Generate the week day as a displayable string
 void day_of_week(PblTm *t, char *line, size_t length) {
   memset(line, 0, length);
 
   // Two Letter Day of the Week
   string_format_time(line, length, "%a", t);
   line[0] += 32;
-  line[2] = 0;
+  // Truncate to two characters
+  // line[2] = 0;
 }
 
 // Update screen based on new time
@@ -274,7 +276,8 @@ void click_config_provider(ClickConfig **config, Window *window) {
 
 void handle_init(AppContextRef ctx) {
   	(void)ctx;
-        short TextLineOffset, DateOffset;
+        short TextLineVOffset, DateVOffset;
+        short WeekdayHOffset, DateHOffset, DateEndHOffset, GapSpacing, HMax;
         
 	window_init(&window, "TextWatch");
 	window_stack_push(&window, true);
@@ -284,41 +287,53 @@ void handle_init(AppContextRef ctx) {
 	resource_init_current_app(&APP_RESOURCES);
 
         // Time/Date Layout Offsets
-        TextLineOffset = 0;
-        DateOffset = 123;
+        TextLineVOffset = 0;
+        DateVOffset = 123;
+
+        WeekdayHOffset = 0;
+        DateHOffset = 66;
+        DateEndHOffset = 1;
+        GapSpacing = -6;
+
+        HMax = 144;
         
 	// 1st line layer
 	text_layer_init(&line1.currentLayer,
-                        GRect(0, TextLineOffset, 144, 50));
+                        GRect(0, TextLineVOffset, 144, 50));
 	text_layer_init(&line1.nextLayer,
-                        GRect(144, TextLineOffset, 144, 50));
+                        GRect(144, TextLineVOffset, 144, 50));
 	configureBoldLayer(&line1.currentLayer, false);
 	configureBoldLayer(&line1.nextLayer, false);
 
 	// 2nd line layer
 	text_layer_init(&line2.currentLayer,
-                        GRect(0, 37 + TextLineOffset, 144, 50));
+                        GRect(0, 37 + TextLineVOffset, 144, 50));
 	text_layer_init(&line2.nextLayer,
-                        GRect(144, 37 + TextLineOffset, 144, 50));
+                        GRect(144, 37 + TextLineVOffset, 144, 50));
 	configureLightLayer(&line2.currentLayer, false);
 	configureLightLayer(&line2.nextLayer, false);
 
 	// 3rd line layer
 	text_layer_init(&line3.currentLayer,
-                        GRect(0, 74 + TextLineOffset, 144, 50));
+                        GRect(0, 74 + TextLineVOffset, 144, 50));
 	text_layer_init(&line3.nextLayer,
-                        GRect(144, 74 + TextLineOffset, 144, 50));
+                        GRect(144, 74 + TextLineVOffset, 144, 50));
 	configureLightLayer(&line3.currentLayer, false);
 	configureLightLayer(&line3.nextLayer, false);
 
 	// 4th layer - Week Day
-	text_layer_init(&line4.currentLayer, GRect(0, DateOffset, 62, 50));
-	configureLightLayer(&line4.currentLayer, true);
+	// text_layer_init(&line4.currentLayer, GRect(0, DateVOffset, 65, 50));
+	text_layer_init(&line4.currentLayer,
+          GRect(WeekdayHOffset, DateVOffset, DateHOffset - GapSpacing, 50));
+	configureLightLayer(&line4.currentLayer, false);
 
 	// 5th layer - Date
+	// text_layer_init(&line5.currentLayer,
+        //                 GRect(66, 8 + DateVOffset, 79, 50));
 	text_layer_init(&line5.currentLayer,
-                        GRect(66, 8 + DateOffset, 80, 50));
-	configureDateLayer(&line5.currentLayer, false);
+          GRect(DateHOffset, 8 + DateVOffset,
+                HMax + DateEndHOffset - DateHOffset , 50));
+	configureDateLayer(&line5.currentLayer, true);
 
 	// Configure time on init
 	get_time(&t);
