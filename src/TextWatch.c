@@ -35,6 +35,22 @@ Line line3;
 Line line4;
 Line line5;
 
+// Time/Date Layout Parameters
+#define TextLineVOffset 0
+#define DateVOffset 123
+#define WeekdayHOffset 0
+#define DateHOffset 66
+#define DateEndHOffset 1
+#define GapSpacing -6
+#define HMax 144
+
+
+Layer lineDrawLayer;
+
+// Line Draw Parameters
+#define lineInset 10
+#define lineVOffset 128
+
 PblTm t;
 
 static char line1Str[2][BUFFER_SIZE];
@@ -135,6 +151,21 @@ void day_of_week(PblTm *t, char *line, size_t length) {
   line[0] += 32;
   // Truncate to two characters
   // line[2] = 0;
+}
+
+// Update LineDraw Callback
+void lineDrawLayerCallback(Layer *me, GContext* ctx) {
+  (void)me;
+
+  graphics_context_set_stroke_color(ctx, GColorWhite);
+  
+  graphics_draw_line(ctx, GPoint(0 + lineInset, lineVOffset),
+                     GPoint(window.layer.frame.size.w - lineInset,
+                            lineVOffset));
+  graphics_draw_line(ctx, GPoint(0 + lineInset, lineVOffset + 1),
+                     GPoint(window.layer.frame.size.w - lineInset,
+                            lineVOffset + 1));
+
 }
 
 // Update screen based on new time
@@ -276,26 +307,13 @@ void click_config_provider(ClickConfig **config, Window *window) {
 
 void handle_init(AppContextRef ctx) {
   	(void)ctx;
-        short TextLineVOffset, DateVOffset;
-        short WeekdayHOffset, DateHOffset, DateEndHOffset, GapSpacing, HMax;
-        
+
 	window_init(&window, "TextWatch");
 	window_stack_push(&window, true);
 	window_set_background_color(&window, GColorBlack);
 
 	// Init resources
 	resource_init_current_app(&APP_RESOURCES);
-
-        // Time/Date Layout Offsets
-        TextLineVOffset = 0;
-        DateVOffset = 123;
-
-        WeekdayHOffset = 0;
-        DateHOffset = 66;
-        DateEndHOffset = 1;
-        GapSpacing = -6;
-
-        HMax = 144;
         
 	// 1st line layer
 	text_layer_init(&line1.currentLayer,
@@ -320,6 +338,11 @@ void handle_init(AppContextRef ctx) {
                         GRect(144, 74 + TextLineVOffset, 144, 50));
 	configureLightLayer(&line3.currentLayer, false);
 	configureLightLayer(&line3.nextLayer, false);
+
+        // LineDrawLayer
+        layer_init(&lineDrawLayer, window.layer.frame);
+        lineDrawLayer.update_proc = &lineDrawLayerCallback;
+
 
 	// 4th layer - Week Day
 	// text_layer_init(&line4.currentLayer, GRect(0, DateVOffset, 65, 50));
@@ -346,6 +369,7 @@ void handle_init(AppContextRef ctx) {
 	layer_add_child(&window.layer, &line2.nextLayer.layer);
 	layer_add_child(&window.layer, &line3.currentLayer.layer);
 	layer_add_child(&window.layer, &line3.nextLayer.layer);
+        layer_add_child(&window.layer, &lineDrawLayer);
 	layer_add_child(&window.layer, &line4.currentLayer.layer);
 	layer_add_child(&window.layer, &line5.currentLayer.layer);
 	
