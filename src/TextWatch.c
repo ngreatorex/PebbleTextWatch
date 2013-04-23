@@ -29,27 +29,32 @@ typedef struct {
 	PropertyAnimation nextAnimation;
 } Line;
 
+// Time/Date Layout Parameters
+#define TextLineVOffset 0
+#define DateVOffset     123
+#define WeekdayHOffset  0
+#define DateHOffset     65
+#define DateEndHOffset  0
+#define GapSpacing      -7
+#define HMax           144
+
+#define WeekdayRightJust false
+#define DateRightJust    true
+
 Line line1;
 Line line2;
 Line line3;
 Line line4;
 Line line5;
 
-// Time/Date Layout Parameters
-#define TextLineVOffset 0
-#define DateVOffset 123
-#define WeekdayHOffset 0
-#define DateHOffset 66
-#define DateEndHOffset 1
-#define GapSpacing -6
-#define HMax 144
-
-
-Layer lineDrawLayer;
-
 // Line Draw Parameters
-#define lineInset 10
+#define lineInset   10
 #define lineVOffset 128
+#define DRAW_LINE   true
+
+#if DRAW_LINE
+Layer lineDrawLayer;
+#endif
 
 PblTm t;
 
@@ -153,6 +158,7 @@ void day_of_week(PblTm *t, char *line, size_t length) {
   // line[2] = 0;
 }
 
+#if DRAW_LINE
 // Update LineDraw Callback
 void lineDrawLayerCallback(Layer *me, GContext* ctx) {
   (void)me;
@@ -167,6 +173,7 @@ void lineDrawLayerCallback(Layer *me, GContext* ctx) {
                             lineVOffset + 1));
 
 }
+#endif
 
 // Update screen based on new time
 void display_time(PblTm *t)
@@ -339,16 +346,17 @@ void handle_init(AppContextRef ctx) {
 	configureLightLayer(&line3.currentLayer, false);
 	configureLightLayer(&line3.nextLayer, false);
 
+#if DRAW_LINE
         // LineDrawLayer
         layer_init(&lineDrawLayer, window.layer.frame);
         lineDrawLayer.update_proc = &lineDrawLayerCallback;
-
-
+#endif
+        
 	// 4th layer - Week Day
 	// text_layer_init(&line4.currentLayer, GRect(0, DateVOffset, 65, 50));
 	text_layer_init(&line4.currentLayer,
           GRect(WeekdayHOffset, DateVOffset, DateHOffset - GapSpacing, 50));
-	configureLightLayer(&line4.currentLayer, false);
+	configureLightLayer(&line4.currentLayer, WeekdayRightJust);
 
 	// 5th layer - Date
 	// text_layer_init(&line5.currentLayer,
@@ -356,7 +364,7 @@ void handle_init(AppContextRef ctx) {
 	text_layer_init(&line5.currentLayer,
           GRect(DateHOffset, 8 + DateVOffset,
                 HMax + DateEndHOffset - DateHOffset , 50));
-	configureDateLayer(&line5.currentLayer, true);
+	configureDateLayer(&line5.currentLayer, DateRightJust);
 
 	// Configure time on init
 	get_time(&t);
@@ -369,7 +377,9 @@ void handle_init(AppContextRef ctx) {
 	layer_add_child(&window.layer, &line2.nextLayer.layer);
 	layer_add_child(&window.layer, &line3.currentLayer.layer);
 	layer_add_child(&window.layer, &line3.nextLayer.layer);
+#if DRAW_LINE
         layer_add_child(&window.layer, &lineDrawLayer);
+#endif
 	layer_add_child(&window.layer, &line4.currentLayer.layer);
 	layer_add_child(&window.layer, &line5.currentLayer.layer);
 	
