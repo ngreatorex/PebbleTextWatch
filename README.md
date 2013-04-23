@@ -9,11 +9,11 @@ This watch is a modification of the built in Text Watch face to add date informa
 
 Versions:
 
-[1] I've added a Date Line at the bottom and corrected times at the top of the hour to read 10:02 as 'ten oh two'.  The weekday is a 2 letter abbreviation.
+[1] I've added a Date Line at the bottom and corrected times at the top of the hour to read 10:02 as 'ten oh two'.  The weekday is a 2 letter abbreviation. (Second picture below)
 
 [2] Weekday and MM.DD are justified to the outside (left and right respectively) and the weekday is abbreviated as 2 or 3 letters depending on rendered width.
 
-[3] A line separator has been added between the time and date.
+[3] A line separator has been added between the time and date. (First picture below)
 
 [4] This is version [1] with the date representation changed to DD.MM for non-US users.  Thanks to James Wigglesworth!
 
@@ -22,3 +22,4 @@ Compiled build of version [3]: https://dl.dropboxusercontent.com/u/11537951/text
 
 Screenshot:  
 ![Text watch screenshot](http://i.imgur.com/cQBVK5c.jpg)
+![Text watch screenshot](https://dl.dropboxusercontent.com/u/1636596/IMG_20130423_140647.jpg)
