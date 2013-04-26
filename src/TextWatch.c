@@ -4,7 +4,10 @@
 
 #include "num2words-en.h"
 
-#define DEBUG 0
+// Options
+#define DEBUG false
+// NOTE: To control the rendering of "oh", see: num2words-en.c
+
 #define BUFFER_SIZE 44
 
 // TODO: Figure out how to get a new UUID
@@ -48,9 +51,9 @@ Line line4;
 Line line5;
 
 // Line Draw Parameters
+#define DRAW_LINE   true
 #define lineInset   10
 #define lineVOffset 128
-#define DRAW_LINE   true
 
 #if DRAW_LINE
 Layer lineDrawLayer;

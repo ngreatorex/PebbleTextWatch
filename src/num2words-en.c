@@ -1,5 +1,11 @@
 #include "num2words-en.h"
 #include "string.h"
+#define true 1
+#define false 0
+
+// Options
+#define DEBUG false
+#define TIME_RENDER_OH false
 
 static const char* const ONES[] = {
   "o'clock",
@@ -83,11 +89,11 @@ void time_to_words(int hours, int minutes, char* words, size_t length) {
   if (hours == 0 || hours == 12) {
     remaining -= append_string(words, remaining, TEENS[2]);
   } else {
-    remaining -= append_number(words, hours % 12, 0);
+    remaining -= append_number(words, hours % 12, false);
   }
 
   remaining -= append_string(words, remaining, " ");
-  remaining -= append_number(words, minutes, 1);
+  remaining -= append_number(words, minutes, TIME_RENDER_OH);
   remaining -= append_string(words, remaining, " ");
 }
 
