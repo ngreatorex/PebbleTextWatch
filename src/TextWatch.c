@@ -125,7 +125,7 @@ bool needToUpdateLine(Line *line, char lineStr[2][BUFFER_SIZE], char *nextValue)
 void date_to_string(PblTm *t, char *line, size_t length) {
   memset(line, 0, length);
  
-  string_format_time(line, length, "%m.%d", t);
+  string_format_time(line, length, DateFormat, t);
   // Replace leading '0' in month and day with ''
   if (line[3] == '0') memmove(&line[3], &line[4], length - 4);
   if (line[0] =='0') memmove(&line[0], &line[1], length - 1);

@@ -4,11 +4,18 @@
 #define DateSeparatorLine    true
 #define DateTruncTo2Char     false
 #define DateOutsideJustified true
+#define DateFormatUS         true
 ////////////////////////////////////
 
 // Time/Date Layout Parameters
 #define TextLineVOffset 0
 #define DateVOffset     123
+
+#if DateFormatUS
+#define DateFormat "%m.%d"
+#else
+#define DateFormat "%d.%m"
+#endif
 
 #if DateOutsideJustified
 // Outside -> Weekday is left justified and Date is right justified
