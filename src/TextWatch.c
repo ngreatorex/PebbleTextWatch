@@ -3,11 +3,9 @@
 #include "pebble_fonts.h"
 
 #include "num2words-en.h"
+#include "config.h"
 
-// Options
 #define DEBUG false
-// NOTE: To control the rendering of "oh", see: num2words-en.c
-
 #define BUFFER_SIZE 44
 
 // TODO: Figure out how to get a new UUID
@@ -32,30 +30,13 @@ typedef struct {
 	PropertyAnimation nextAnimation;
 } Line;
 
-// Time/Date Layout Parameters
-#define TextLineVOffset 0
-#define DateVOffset     123
-#define WeekdayHOffset  0
-#define DateHOffset     65
-#define DateEndHOffset  0
-#define GapSpacing      -7
-#define HMax           144
-
-#define WeekdayRightJust false
-#define DateRightJust    true
-
 Line line1;
 Line line2;
 Line line3;
 Line line4;
 Line line5;
 
-// Line Draw Parameters
-#define DRAW_LINE   true
-#define lineInset   10
-#define lineVOffset 128
-
-#if DRAW_LINE
+#if DateSeparatorLine
 Layer lineDrawLayer;
 #endif
 
@@ -154,14 +135,18 @@ void date_to_string(PblTm *t, char *line, size_t length) {
 void day_of_week(PblTm *t, char *line, size_t length) {
   memset(line, 0, length);
 
-  // Two Letter Day of the Week
+  // Three Letter Day of the Week
   string_format_time(line, length, "%a", t);
+  // tolower 1st char
   line[0] += 32;
+
+#if DateTruncTo2Char
   // Truncate to two characters
-  // line[2] = 0;
+  line[2] = 0;
+#endif
 }
 
-#if DRAW_LINE
+#if DateSeparatorLine
 // Update LineDraw Callback
 void lineDrawLayerCallback(Layer *me, GContext* ctx) {
   (void)me;
@@ -349,7 +334,7 @@ void handle_init(AppContextRef ctx) {
 	configureLightLayer(&line3.currentLayer, false);
 	configureLightLayer(&line3.nextLayer, false);
 
-#if DRAW_LINE
+#if DateSeparatorLine
         // LineDrawLayer
         layer_init(&lineDrawLayer, window.layer.frame);
         lineDrawLayer.update_proc = &lineDrawLayerCallback;
@@ -358,15 +343,16 @@ void handle_init(AppContextRef ctx) {
 	// 4th layer - Week Day
 	// text_layer_init(&line4.currentLayer, GRect(0, DateVOffset, 65, 50));
 	text_layer_init(&line4.currentLayer,
-          GRect(WeekdayHOffset, DateVOffset, DateHOffset - GapSpacing, 50));
+          GRect(WeekdayHStart, DateVOffset,
+                WeekdayHStop - WeekdayHStart, 50));
 	configureLightLayer(&line4.currentLayer, WeekdayRightJust);
 
 	// 5th layer - Date
 	// text_layer_init(&line5.currentLayer,
         //                 GRect(66, 8 + DateVOffset, 79, 50));
 	text_layer_init(&line5.currentLayer,
-          GRect(DateHOffset, 8 + DateVOffset,
-                HMax + DateEndHOffset - DateHOffset , 50));
+          GRect(DateHStart, 8 + DateVOffset,
+                DateHStop - DateHStart , 50));
 	configureDateLayer(&line5.currentLayer, DateRightJust);
 
 	// Configure time on init
@@ -380,7 +366,7 @@ void handle_init(AppContextRef ctx) {
 	layer_add_child(&window.layer, &line2.nextLayer.layer);
 	layer_add_child(&window.layer, &line3.currentLayer.layer);
 	layer_add_child(&window.layer, &line3.nextLayer.layer);
-#if DRAW_LINE
+#if DateSeparatorLine
         layer_add_child(&window.layer, &lineDrawLayer);
 #endif
 	layer_add_child(&window.layer, &line4.currentLayer.layer);
