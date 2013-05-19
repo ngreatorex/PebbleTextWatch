@@ -3,7 +3,7 @@
 #define TimeRenderOh         true
 #define DateSeparatorLine    true
 #define DateOutsideJustified true
-#define DateFormatUS         true
+#define DateFormatUS         false
 ////////////////////////////////////
 
 // Time/Date Layout Parameters
