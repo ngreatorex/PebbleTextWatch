@@ -213,21 +213,9 @@ void configureLightLayer(TextLayer *textlayer, bool right)
         }
 }
 
-void configureWeekdayLayer(TextLayer *textlayer, bool right)
-{
-	text_layer_set_font(textlayer, fonts_get_system_font(FONT_KEY_GOTHIC_18));
-	text_layer_set_text_color(textlayer, GColorWhite);
-	text_layer_set_background_color(textlayer, GColorClear);
-        if (right) {
-          text_layer_set_text_alignment(textlayer, GTextAlignmentRight);
-        } else {
-          text_layer_set_text_alignment(textlayer, GTextAlignmentLeft);
-        }
-}
-
 void configureDateLayer(TextLayer *textlayer, bool right)
 {
-	text_layer_set_font(textlayer, fonts_get_system_font(FONT_KEY_GOTHIC_18));
+	text_layer_set_font(textlayer, fonts_get_system_font(FONT_KEY_GOTHIC_24));
 	text_layer_set_text_color(textlayer, GColorWhite);
 	text_layer_set_background_color(textlayer, GColorClear);
         if (right) {

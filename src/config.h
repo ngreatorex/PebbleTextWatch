@@ -13,7 +13,7 @@
 #if DateFormatUS
 #define DateFormat "%m.%d"
 #else
-#define DateFormat "%A %d/%m/%Y"
+#define DateFormat "%a %d/%m/%Y"
 #endif
 
 #define DateTruncTo2Char false
