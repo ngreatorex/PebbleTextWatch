@@ -34,7 +34,6 @@ Line line1;
 Line line2;
 Line line3;
 Line line4;
-Line line5;
 
 #if DateSeparatorLine
 Layer lineDrawLayer;
@@ -46,7 +45,6 @@ static char line1Str[2][BUFFER_SIZE];
 static char line2Str[2][BUFFER_SIZE];
 static char line3Str[2][BUFFER_SIZE];
 static char line4Str[2][BUFFER_SIZE];
-static char line5Str[2][BUFFER_SIZE];
 
 static bool textInitialized = false;
 
@@ -126,24 +124,9 @@ void date_to_string(PblTm *t, char *line, size_t length) {
   memset(line, 0, length);
  
   string_format_time(line, length, DateFormat, t);
-  // Replace leading '0' in month and day with ''
-  if (line[3] == '0') memmove(&line[3], &line[4], length - 4);
-  if (line[0] =='0') memmove(&line[0], &line[1], length - 1);
-}
-
-// Generate the week day as a displayable string
-void day_of_week(PblTm *t, char *line, size_t length) {
-  memset(line, 0, length);
-
-  // Three Letter Day of the Week
-  string_format_time(line, length, "%a", t);
-  // tolower 1st char
+  
+  // day of week to lowercase
   line[0] += 32;
-
-#if DateTruncTo2Char
-  // Truncate to two characters
-  line[2] = 0;
-#endif
 }
 
 #if DateSeparatorLine
@@ -171,11 +154,9 @@ void display_time(PblTm *t)
 	char textLine2[BUFFER_SIZE];
 	char textLine3[BUFFER_SIZE];
 	char textLine4[BUFFER_SIZE];
-	char textLine5[BUFFER_SIZE];
 	
 	time_to_3words(t->tm_hour, t->tm_min, textLine1, textLine2, textLine3, BUFFER_SIZE);
-        day_of_week(t, textLine4, BUFFER_SIZE);
-        date_to_string(t, textLine5, BUFFER_SIZE);
+    date_to_string(t, textLine4, BUFFER_SIZE);
 	
 	if (needToUpdateLine(&line1, line1Str, textLine1)) {
 		updateLineTo(&line1, line1Str, textLine1);	
@@ -187,14 +168,9 @@ void display_time(PblTm *t)
 		updateLineTo(&line3, line3Str, textLine3);	
 	}
 	if (needToUpdateLine(&line4, line4Str, textLine4)) {
-          memset(line4Str[0], 0, BUFFER_SIZE);
-          memcpy(line4Str[0], textLine4, strlen(textLine4));
-          text_layer_set_text(&line4.currentLayer, line4Str[0]);
-	}
-	if (needToUpdateLine(&line5, line5Str, textLine5)) {
-          memset(line5Str[0], 0, BUFFER_SIZE);
-          memcpy(line5Str[0], textLine5, strlen(textLine5));
-          text_layer_set_text(&line5.currentLayer, line5Str[0]);
+        memset(line4Str[0], 0, BUFFER_SIZE);
+        memcpy(line4Str[0], textLine4, strlen(textLine4));
+        text_layer_set_text(&line4.currentLayer, line4Str[0]);
 	}
 }
 
@@ -202,14 +178,12 @@ void display_time(PblTm *t)
 void display_initial_time(PblTm *t)
 {
 	time_to_3words(t->tm_hour, t->tm_min, line1Str[0], line2Str[0], line3Str[0], BUFFER_SIZE);
-        day_of_week(t, line4Str[0], BUFFER_SIZE);
-        date_to_string(t, line5Str[0], BUFFER_SIZE);
+    date_to_string(t, line4Str[0], BUFFER_SIZE);
         
 	text_layer_set_text(&line1.currentLayer, line1Str[0]);
 	text_layer_set_text(&line2.currentLayer, line2Str[0]);
 	text_layer_set_text(&line3.currentLayer, line3Str[0]);
 	text_layer_set_text(&line4.currentLayer, line4Str[0]);
-	text_layer_set_text(&line5.currentLayer, line5Str[0]);
 }
 
 
@@ -239,10 +213,21 @@ void configureLightLayer(TextLayer *textlayer, bool right)
         }
 }
 
+void configureWeekdayLayer(TextLayer *textlayer, bool right)
+{
+	text_layer_set_font(textlayer, fonts_get_system_font(FONT_KEY_GOTHIC_18));
+	text_layer_set_text_color(textlayer, GColorWhite);
+	text_layer_set_background_color(textlayer, GColorClear);
+        if (right) {
+          text_layer_set_text_alignment(textlayer, GTextAlignmentRight);
+        } else {
+          text_layer_set_text_alignment(textlayer, GTextAlignmentLeft);
+        }
+}
 
 void configureDateLayer(TextLayer *textlayer, bool right)
 {
-	text_layer_set_font(textlayer, fonts_get_system_font(FONT_KEY_GOTHAM_34_MEDIUM_NUMBERS));
+	text_layer_set_font(textlayer, fonts_get_system_font(FONT_KEY_GOTHIC_18));
 	text_layer_set_text_color(textlayer, GColorWhite);
 	text_layer_set_background_color(textlayer, GColorClear);
         if (right) {
@@ -340,20 +325,13 @@ void handle_init(AppContextRef ctx) {
         lineDrawLayer.update_proc = &lineDrawLayerCallback;
 #endif
         
-	// 4th layer - Week Day
-	// text_layer_init(&line4.currentLayer, GRect(0, DateVOffset, 65, 50));
-	text_layer_init(&line4.currentLayer,
-          GRect(WeekdayHStart, DateVOffset,
-                WeekdayHStop - WeekdayHStart, 50));
-	configureLightLayer(&line4.currentLayer, WeekdayRightJust);
-
 	// 5th layer - Date
 	// text_layer_init(&line5.currentLayer,
         //                 GRect(66, 8 + DateVOffset, 79, 50));
-	text_layer_init(&line5.currentLayer,
-          GRect(DateHStart, 8 + DateVOffset,
+	text_layer_init(&line4.currentLayer,
+          GRect(DateHStart, DateVOffset,
                 DateHStop - DateHStart , 50));
-	configureDateLayer(&line5.currentLayer, DateRightJust);
+	configureDateLayer(&line4.currentLayer, DateRightJust);
 
 	// Configure time on init
 	get_time(&t);
@@ -370,7 +348,6 @@ void handle_init(AppContextRef ctx) {
         layer_add_child(&window.layer, &lineDrawLayer);
 #endif
 	layer_add_child(&window.layer, &line4.currentLayer.layer);
-	layer_add_child(&window.layer, &line5.currentLayer.layer);
 	
 #if DEBUG
 	// Button functionality
