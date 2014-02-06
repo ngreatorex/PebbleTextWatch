@@ -11,7 +11,7 @@
 #define DateVOffset     140
 
 #if DateFormatUS
-#define DateFormat "%m.%d"
+#define DateFormat "%a %m/%d/%Y"
 #else
 #define DateFormat "%a %d/%m/%Y"
 #endif
