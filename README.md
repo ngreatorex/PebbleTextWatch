@@ -11,3 +11,5 @@ This is a modification of the excellent work by [stough](https://github.com/stou
 
 Screenshot:  
 ![Text watch screenshot](pebble-screenshot_2014-02-06_03-12-13.png)
+![Text watch menu](pebble-screenshot_2014-02-06_03-53-49.png)
+
