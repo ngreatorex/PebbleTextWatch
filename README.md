@@ -1,5 +1,5 @@
-Pebble Text Watch
-=================
+Pebble Text Watch with Date
+===========================
 
 On the first launch of Pebble SDK, TextWatch application was not part of the code examples.
 Many people wanted to change the texts into their own language and with this app we hope that others will improve it 
@@ -9,7 +9,8 @@ This watch is a modification of the built in Text Watch face to add date informa
 
 This is a modification of the excellent work by [stough](https://github.com/stough/PebbleTextWatch) to make the date much smaller and include the full year.
 
-Screenshot:  
+Screenshots:  
 ![Text watch screenshot](pebble-screenshot_2014-02-06_03-12-13.png)
+&nbsp;&nbsp;
 ![Text watch menu](pebble-screenshot_2014-02-06_03-53-49.png)
 
