@@ -1,6 +1,6 @@
 {
   "uuid": "de3864db-492f-4ac9-92cf-e24217370324",
-  "shortName": "Text Watch",
+  "shortName": "Text & Date",
   "longName": "Text Watch with Date",
   "companyName": "Neil Greatorex",
   "versionCode": 1,
@@ -12,6 +12,13 @@
     "dummy": 0
   },
   "resources": {
-    "media": []
+    "media": [
+      {
+        "type": "png",
+        "name": "MENU_ICON",
+        "file": "images/text-watch-icon.png",
+        "menuIcon": true
+      }
+    ]
   }
 }
