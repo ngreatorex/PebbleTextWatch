@@ -9,4 +9,3 @@ Pebble.addEventListener("appmessage",
     console.log("Received message: " + e.payload);
   }
 );
-

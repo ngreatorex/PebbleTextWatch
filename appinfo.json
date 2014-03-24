@@ -1,24 +1,27 @@
 {
-  "uuid": "de3864db-492f-4ac9-92cf-e24217370324",
-  "shortName": "Text & Date",
-  "longName": "Text Watch with Date",
-  "companyName": "Neil Greatorex",
-  "versionCode": 2,
-  "versionLabel": "1.0.1",
-  "watchapp": {
-    "watchface": true
-  },
-  "appKeys": {
-    "operation": 1
-  },
-  "resources": {
-    "media": [
-      {
-        "type": "png",
-        "name": "MENU_ICON",
-        "file": "images/text-watch-icon.png",
-        "menuIcon": true
-      }
-    ]
-  }
+    "versionLabel": "1.0.1",
+    "uuid": "de3864db-492f-4ac9-92cf-e24217370324",
+    "appKeys": {
+        "operation": 1
+    },
+    "longName": "Text Watch with Date",
+    "versionCode": 2,
+    "capabilities": [
+        ""
+    ],
+    "shortName": "Text & Date",
+    "companyName": "Neil Greatorex",
+    "watchapp": {
+        "watchface": true
+    },
+    "resources": {
+        "media": [
+            {
+                "menuIcon": true,
+                "type": "png",
+                "name": "MENU_ICON",
+                "file": "images/text-watch-icon.png"
+            }
+        ]
+    }
 }
