@@ -1,10 +1,11 @@
 #include <pebble.h>
-#include "pebble_fonts.h"
 #include "num2words-en.h"
 #include "config.h"
 
 #define DEBUG false
 #define BUFFER_SIZE 44
+
+#define DICT_KEY_OPERATION 1
 
 Window *window;
 
@@ -198,11 +199,106 @@ static void handle_minute_tick(struct tm *tick_time, TimeUnits units_changed)
 	display_time(tick_time);
 }
 
+void out_sent_handler(DictionaryIterator *iter, void *context) 
+{
+	// outgoing message was delivered
+	APP_LOG(APP_LOG_LEVEL_DEBUG, "AppMessage sent");
+
+	Tuple *oper_tuple = dict_find(iter, DICT_KEY_OPERATION);
+
+	// Act on the found fields received
+	if (oper_tuple) 
+	{
+		APP_LOG(APP_LOG_LEVEL_DEBUG, "Operation: %s", oper_tuple->value->cstring);
+	}
+          
+}
+
+
+void out_failed_handler(DictionaryIterator *failed, AppMessageResult reason, void *context) 
+{
+	// outgoing message failed
+	APP_LOG(APP_LOG_LEVEL_DEBUG, "AppMessage send failed");
+}
+
+
+void in_received_handler(DictionaryIterator *iter, void *context) 
+{
+	// incoming message received
+	APP_LOG(APP_LOG_LEVEL_DEBUG, "AppMessage received");
+
+	Tuple *oper_tuple = dict_find(iter, DICT_KEY_OPERATION);
+
+	// Act on the found fields received
+	if (oper_tuple) 
+	{
+		APP_LOG(APP_LOG_LEVEL_DEBUG, "Operation: %s", oper_tuple->value->cstring);
+	}
+}
+
+
+void in_dropped_handler(AppMessageResult reason, void *context) 
+{
+	// incoming message dropped
+	APP_LOG(APP_LOG_LEVEL_DEBUG, "AppMessage dropped");
+}
+
+static void init_appmessage()
+{
+	const int inbound_size = 64;
+	const int outbound_size = 64;
+	
+	app_message_register_inbox_received(in_received_handler);
+	app_message_register_inbox_dropped(in_dropped_handler);
+	app_message_register_outbox_sent(out_sent_handler);
+	app_message_register_outbox_failed(out_failed_handler);
+
+	app_message_open(inbound_size, outbound_size);
+}
+
+static void send_lifx_toggle()
+{
+	DictionaryIterator *iter;
+	app_message_outbox_begin(&iter);
+
+	Tuplet value = TupletCString(DICT_KEY_OPERATION, "toggle");
+	dict_write_tuplet(iter, &value);
+
+	app_message_outbox_send();
+}
+
+void lifx_toggle_click_handler(ClickRecognizerRef recognizer, void *context)
+{
+	APP_LOG(APP_LOG_LEVEL_DEBUG, "Button pressed");
+	send_lifx_toggle();
+}
+
+void lifx_toggle_release_handler(ClickRecognizerRef recognizer, void *context)
+{
+	APP_LOG(APP_LOG_LEVEL_DEBUG, "Button released");
+}
+
+void click_config_provider(Window *window) 
+{
+	window_single_click_subscribe(BUTTON_ID_SELECT, lifx_toggle_click_handler);
+	window_long_click_subscribe(BUTTON_ID_BACK, 700, lifx_toggle_click_handler, lifx_toggle_release_handler);
+}
+
+void accel_tap_handler(AccelAxisType axis, int32_t direction)
+{
+	APP_LOG(APP_LOG_LEVEL_DEBUG, "Watch tapped");
+	send_lifx_toggle();
+}
+
 void handle_init() 
 {
 	window = window_create();
 	window_stack_push(window, true);
 	window_set_background_color(window, GColorBlack);
+
+	init_appmessage();
+
+	accel_tap_service_subscribe(&accel_tap_handler);
 
 	// 1st line layer
 	line1.currentLayer = text_layer_create(GRect(0, TextLineVOffset, 144, 50));
@@ -232,6 +328,9 @@ void handle_init()
                 DateHStop - DateHStart , 50));
 	configureDateLayer(line4.currentLayer, DateRightJust);
 
+	// Allow clicks
+	window_set_click_config_provider(window, (ClickConfigProvider) click_config_provider);
+
 	// Configure time on init
 	time_t now = time(NULL);
 	struct tm *t = localtime(&now);
@@ -255,6 +354,8 @@ void handle_init()
 void handle_deinit()
 {
 	tick_timer_service_unsubscribe();
+
+	accel_tap_service_unsubscribe();
 
 	text_layer_destroy(line1.currentLayer);
 	text_layer_destroy(line1.nextLayer);
