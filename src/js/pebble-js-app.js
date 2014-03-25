@@ -1,3 +1,5 @@
+/* vim:set noet ts=2 sw=2: */
+
 var settings = {
 	"server": "http://raspi-d.lan:3000/",
 	"selector": "tag%3aPebble%20Controlled",
@@ -36,4 +38,3 @@ Pebble.addEventListener("appmessage",
 	}
 );
 
-/* vim:ts=2:sw=2:noet */
