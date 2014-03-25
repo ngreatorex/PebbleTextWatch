@@ -1,5 +1,5 @@
 var settings = {
-	"server": "http://192.168.1.103:3000/",
+	"server": "http://raspi-d.lan:3000/",
 	"selector": "tag%3aPebble%20Controlled",
 };
 
