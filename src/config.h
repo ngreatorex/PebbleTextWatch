@@ -25,5 +25,13 @@
 #define lineInset   10
 #define lineVOffset 128
 
+#ifdef PBL_COLOR
+	#define FORE_COLOR GColorPastelYellow
+	#define BACK_COLOR GColorJazzberryJam 
+#else 
+	#define FORE_COLOR GColorWhite
+	#define BACK_COLOR GColorBlack
+#endif 
+
 
 
