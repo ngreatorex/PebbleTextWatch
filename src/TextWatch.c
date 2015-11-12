@@ -47,23 +47,23 @@ void makeAnimationsForLayers(Line *line, TextLayer *current, TextLayer *next)
 	rect.origin.x -= 144;
 	
 	line->nextAnimation = property_animation_create_layer_frame((Layer *)next, NULL, &rect);
-	animation_set_duration(&line->nextAnimation->animation, 400);
-	animation_set_curve(&line->nextAnimation->animation, AnimationCurveEaseOut);
+	animation_set_duration(property_animation_get_animation(line->nextAnimation), 400);
+	animation_set_curve(property_animation_get_animation(line->nextAnimation), AnimationCurveEaseOut);
 
-	animation_schedule(&line->nextAnimation->animation);
+	animation_schedule(property_animation_get_animation(line->nextAnimation));
 	
 	GRect rect2 = layer_get_frame((Layer *)current);
 	rect2.origin.x -= 144;
 	
 	line->currentAnimation = property_animation_create_layer_frame((Layer *)current, NULL, &rect2);
-	animation_set_duration(&line->currentAnimation->animation, 400);
-	animation_set_curve(&line->currentAnimation->animation, AnimationCurveEaseOut);
+	animation_set_duration(property_animation_get_animation(line->currentAnimation), 400);
+	animation_set_curve(property_animation_get_animation(line->currentAnimation), AnimationCurveEaseOut);
 	
-	animation_set_handlers(&line->currentAnimation->animation, (AnimationHandlers) {
+	animation_set_handlers(property_animation_get_animation(line->currentAnimation), (AnimationHandlers) {
 		.stopped = (AnimationStoppedHandler)animationStoppedHandler
 	}, current);
 	
-	animation_schedule(&line->currentAnimation->animation);
+	animation_schedule(property_animation_get_animation(line->currentAnimation));
 }
 
 // Update line
@@ -158,7 +158,7 @@ void display_initial_time(struct tm *t)
 void configureBoldLayer(TextLayer *textlayer, bool right)
 {
 	text_layer_set_font(textlayer, fonts_get_system_font(FONT_KEY_BITHAM_42_BOLD));
-	text_layer_set_text_color(textlayer, GColorWhite);
+	text_layer_set_text_color(textlayer, FORE_COLOR);
 	text_layer_set_background_color(textlayer, GColorClear);
         if (right) {
           text_layer_set_text_alignment(textlayer, GTextAlignmentRight);
@@ -171,7 +171,7 @@ void configureBoldLayer(TextLayer *textlayer, bool right)
 void configureLightLayer(TextLayer *textlayer, bool right)
 {
 	text_layer_set_font(textlayer, fonts_get_system_font(FONT_KEY_BITHAM_42_LIGHT));
-	text_layer_set_text_color(textlayer, GColorWhite);
+	text_layer_set_text_color(textlayer, FORE_COLOR);
 	text_layer_set_background_color(textlayer, GColorClear);
         if (right) {
           text_layer_set_text_alignment(textlayer, GTextAlignmentRight);
@@ -183,7 +183,7 @@ void configureLightLayer(TextLayer *textlayer, bool right)
 void configureDateLayer(TextLayer *textlayer, bool right)
 {
 	text_layer_set_font(textlayer, fonts_get_system_font(FONT_KEY_GOTHIC_24));
-	text_layer_set_text_color(textlayer, GColorWhite);
+	text_layer_set_text_color(textlayer, FORE_COLOR);
 	text_layer_set_background_color(textlayer, GColorClear);
         if (right) {
           text_layer_set_text_alignment(textlayer, GTextAlignmentRight);
@@ -202,7 +202,7 @@ void handle_init()
 {
 	window = window_create();
 	window_stack_push(window, true);
-	window_set_background_color(window, GColorBlack);
+	window_set_background_color(window, BACK_COLOR);
 
 	// 1st line layer
 	line1.currentLayer = text_layer_create(GRect(0, TextLineVOffset, 144, 50));
